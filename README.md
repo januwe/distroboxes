@@ -6,19 +6,26 @@ Here is a collection of my day to day use of distroboxes. I mainly have two dist
 
 ### Installation and usage
 
-1. **Build docker images**
+Make sure you have `distrobox` and either `docker`, `podman` or `lilipod` installed.
+
+1. **Clone and cd into dir**
+  ```sh
+  git clone https://github.com/januwe/distroboxes && cd ./distroboxes
+  ```
+
+2. **Build docker images**
   ```sh
   docker build -f ./clitools.Dockerfile -t clitools .
   docker build -f ./guiapps.Dockerfile -t guiapps .
   ```
 
-2. **Create distrobox container**
+3. **Create distrobox container**
   ```sh
   distrobox-create -i clitools -n clitools
   distrobox-create --nvidia -i guiapps -n guiapps
   ```
 
-3. **Enter distrobox container**
+4. **Enter distrobox container**
   ```sh
   distrobox enter clitools
   ```
