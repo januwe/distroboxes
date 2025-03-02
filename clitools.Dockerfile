@@ -1,4 +1,5 @@
-FROM python:3.11 AS builder1
+# python builder
+FROM python:3.11 AS py_builder
 
 # Setup python3 virtual environment
 ENV VIRTUAL_ENV=/opt/venv
@@ -9,15 +10,26 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 COPY ./requirements.txt . 
 RUN pip install -r requirements.txt
 
-FROM rust:1.67-bullseye AS builder2
+# rust builder
+FROM rust:bullseye AS rust_builder
 
 RUN git clone https://github.com/denisidoro/navi && cd navi && make install
+    
+
+# golang builder
+FROM golang:1.24-alpine AS go_builder
+
+ENV GOBIN=/usr/local/bin/
+RUN go install github.com/charmbracelet/gum@latest \
+    && go install github.com/jesseduffield/lazygit@latest
 
 # Build tools container
 FROM quay.io/toolbx-images/debian-toolbox:12
 
-COPY --from=builder1 /opt/venv /opt/venv 
-COPY --from=builder2 /usr/local/cargo/bin/navi /usr/local/bin/navi
+COPY --from=py_builder /opt/venv /opt/venv 
+COPY --from=rust_builder /usr/local/cargo/bin/navi /usr/local/bin/navi
+COPY --from=go_builder /usr/local/bin/gum /usr/local/bin/gum
+COPY --from=go_builder /usr/local/bin/lazygit /usr/local/bin/lazygit
 
 ENV NAVI_PATH=/usr/share/navi/cheats
 # Install packages that will be installed at build
