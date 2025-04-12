@@ -14,7 +14,6 @@
 FROM rust:slim-bullseye AS rust_builder
 
 RUN apt update && apt install --no-install-recommends -y git make && git clone https://github.com/denisidoro/navi && cd navi && make install
-    
 
 # golang builder
 FROM golang:1.24-alpine AS go_builder
@@ -34,8 +33,9 @@ COPY --from=go_builder /usr/local/bin/lazygit /usr/local/bin/lazygit
 COPY --from=go_builder /usr/local/bin/sesh /usr/local/bin/sesh
 
 # Install packages that will be installed at build
-RUN apt update -y && apt install --no-install-recommends -y bat curl exa fzf git jq silversearcher-ag tmux vim wget xclip zoxide \
+RUN apt update -y && apt install --no-install-recommends -y bat curl exa fzf git jq silversearcher-ag tmux vim wget xclip zoxide zsh \
     && rm -rf /var/lib/apt/lists/* \
     && git clone https://github.com/denisidoro/cheats /usr/share/navi/cheats \
 #     && ln -sf /usr/bin/python3 /opt/venv/bin/python3 \
     && ln -s /usr/bin/batcat /usr/local/bin/bat \
+    && ln -s /usr/bin/distrobox-host-exec /usr/local/bin/docker \
